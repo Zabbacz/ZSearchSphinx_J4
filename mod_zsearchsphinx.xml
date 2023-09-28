@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="module" version="3.1.0" client="site" method="upgrade">
+    <name>ZSearchSphinx</name>
+    <author>Michal Jaksa</author>
+    <version>1.0.0</version>
+    <description>A simple search module.</description>
+
+    <files>
+        <filename>mod_zsearchsphinx.xml</filename>
+        <filename module="mod_zsearchsphinx">mod_zsearchsphinx.php</filename>
+        <filename>index.html</filename>
+        <filename>helper.php</filename>
+        <folder>img</folder>
+        <folder>tmpl</folder>
+        <folder>css</folder>
+        <folder>js</folder>
+        <folder>sql</folder>
+    </files>
+
+        <install>
+     <sql>
+	     <file driver="mysql" charset="utf8">sql/mysql/install/install.mysql.utf8.sql</file>
+         <file driver="sqlazure" charset="utf8">sql/sqlazure/install.sqlazure.utf8.sql</file>
+     </sql>
+    </install>
+
+    <uninstall>
+     <sql>
+	     <file driver="mysql" charset="utf8">sql/mysql/uninstall/uninstall.mysql.utf8.sql</file>
+         <file driver="sqlazure" charset="utf8">sql/sqlazure/uninstall.sqlazure.utf8.sql</file>
+     </sql>
+    </uninstall>
+
+    <update> 
+        <schemas>
+            <schemapath type="mysql">sql/mysql/updates</schemapath> 
+	        <schemapath type="sqlazure">sql/sqlazure/updates</schemapath> 
+        </schemas> 
+    </update>
+
+    <config>
+    </config>
+</extension>
