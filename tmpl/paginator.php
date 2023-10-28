@@ -1,14 +1,17 @@
 <?php
 defined('_JEXEC') or die('Restricted access');
 
-$total = $docs[count((array) ($docs))][0];
-$offset = $docs[count((array) ($docs))][2];
+$total = $docs[count((array) ($docs))]['total'];
+//$total = $docs['total'];
+$offset = $docs[count((array) ($docs))]['offset'];
+//$offset = $docs['offset'];
 $pageCount = ceil($total/$offset);
-?>
-<?php if ($pageCount): ?>
-<?php 
-$query =  $docs[count((array) ($docs))][5];
-$current = $docs[count((array) ($docs))][3];
+$url = '';
+if ($pageCount): 
+$query =  $docs[count((array) ($docs))]['query'];
+//$query =  $docs['query'];
+$current = $docs[count((array) ($docs))]['current'];
+//$current = $docs['current'];
 $start = 0;
 if($current >=2) {
     $previous = $current -1;

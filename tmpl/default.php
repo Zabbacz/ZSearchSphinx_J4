@@ -3,38 +3,55 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 <form method="GET" action="" id="search_form">
-        <input type="text" name="search_box" class="form-control form-control-lg" placeholder="Hledany produkt..." 
-            id="search_box" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" autocomplete="off"
+        <input type="text" name="search_box" class="form-control form-control-lg" placeholder='Hledat produkt...'
+              id="search_box" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" autocomplete="off"
+              value="<?=isset($_GET['search_box'])?htmlentities($_GET['search_box']):''?>"
             onkeyup="javascript:load_data(this.value)"  />
         <span id="search_result"></span>
 
         <input type="submit" class="btn btn-primary"
-	        id="send" name="send" value="Vyhledat">
-</form>
-
+	        id="send" name="send" value="Vyhledat"><br />
 
 <p class="lead">
-    <?php if(isset($docs[count((array) ($docs))][1])):?>
-        Nalezeno položek : <?=$docs[count((array) ($docs))][0]?>
-    <?php
-    if ($docs[count((array) ($docs))][0] == 1) {
-//	    $product_link = (JURI::root().'?option=com_virtuemart&view=productdetails&virtuemart_product_id='.($docs[0] ["virtuemart_product_id"]).'&virtuemart_category_id='.($docs[0] ["virtuemart_category_id"]));
-    $app = JFactory::getApplication();
-    $product_link = JRoute::_('index.php?option=com_virtuemart&view=productdetails&virtuemart_product_id='.($docs[0] ["virtuemart_product_id"]).'&virtuemart_category_id='.($docs[0] ["virtuemart_category_id"]));
-    $app->redirect( JRoute::_($product_link) );
-        
+<?php 
+    if(isset($docs[count((array) ($docs))]['total_found'])):
+        if ($docs[count((array) ($docs))]['total'] == 1) {
+            //	    $product_link = (JURI::root().'?option=com_virtuemart&view=productdetails&virtuemart_product_id='.($docs[0] ["virtuemart_product_id"]).'&virtuemart_category_id='.($docs[0] ["virtuemart_category_id"]));
+            $app = JFactory::getApplication();
+            $product_link = JRoute::_('index.php?option=com_virtuemart&view=productdetails&virtuemart_product_id='.($docs[0] ["virtuemart_product_id"]).'&virtuemart_category_id='.($docs[0] ["virtuemart_category_id"]));
+            $app->redirect( JRoute::_($product_link) );
+            
+    
+            //echo "<script>location.href='$product_link';</script>";
+            //        header('Location: '.$product_link);
+            //        header('Connection: close');
+        }
 
-             //echo "<script>location.href='$product_link';</script>";
-//        header('Location: '.$product_link);
-//        header('Connection: close');
-    }
-    endif;?>
-       
+        $last = count ($docs);
+        $query_znacky = $docs[$last]['query'];
+        $znacky = (ModZSearchSphinxHelper::getManufacturers($query_znacky));
+//        echo '<form method="POST" action="index.php?module=zsearchsphinx" id="search_znacky_form">';
+        echo 'Filtr značek : <br />';        
+        foreach($znacky as $znacka){
+        //echo '<a href='.$znacka.'>'.$znacka.'   --   </a>';
+//        echo'<input type="hidden"  name="znacka_search_"'.$znacka.' value="'.$znacka.'">';
+//        echo'<input type="hidden"  name="query_search_znacka" value="'.$docs.'">';
+        echo'<input type="submit" name="znacky_search" class="btn btn-primary" value="'.$znacka.'">';
+
+        }
+        echo '</form>';
+        echo 'Nalezeno položek : '.$docs[count((array) ($docs))]['total'].'<br />';
+//        echo '</form>';
+    endif;
+
+?>
 </p>     
 <div class="row"><div class="span" style="display: none;"></div>
     <?php if (count((array)($docs)) > 0): ?>
-	<div class="span9"><?php require_once dirname(__FILE__) . '/paginator.php';?></div>
-<?php $i = 0; foreach ($docs as $doc):
+ 	<div class="span9"><?php require_once dirname(__FILE__) . '/paginator.php';?></div>
+<?php
+    
+     $i = 0; foreach ($docs as $doc):
 
             $product_id = $doc["virtuemart_product_id"] ?? null;
             $product_name = $doc['product_name'] ?? null;
@@ -48,7 +65,7 @@ defined('_JEXEC') or die('Restricted access');
                 
                 <div class="main-image">
                     <div class="product-details-imege-handler">
-                <?php $image_link = JUri::root() .'images/stories/virtuemart/product/resized/'.$doc['file_url'];?>
+                <?php $image_link = JUri::root() .'images/virtuemart/product/resized/'.$doc['file_url'];?>
             <img src=<?=$image_link;?>>
                     </div>
                     <div class="clear"></div>
@@ -56,14 +73,14 @@ defined('_JEXEC') or die('Restricted access');
 
                 
       <?php			
-              $product_link = (JURI::root().'?option=com_virtuemart&view=productdetails&virtuemart_product_id='.($doc['virtuemart_product_id']).'&virtuemart_category_id='.($doc['virtuemart_category_id']));
-            ?>    
+              $product_link = (JURI::root().'?option=com_virtuemart&view=productdetails&virtuemart_product_id='.($doc['virtuemart_product_id']).'&virtuemart_category_id='.($doc['virtuemart_category_id'])); 
+       ?>    
             <a href="<?=$product_link; ?>"><?= $doc['product_name']?></a>
             <br />
             <?='<strong>dostupnost : '.$doc['product_availability'].'</strong>' ?>
             <br />
             <br />
-            <?= "<i>Vaše cena : ".substr($doc['s_dph']*$doc['min_order_level'],0,-1)." Kč s DPH </i>"?>    
+            <?= "<i>Vaše cena : ".$doc['product_price']." Kč bez DPH/ks </i>"?>    
 
             <span class="quantity-box">
             <?= "<input class='input-mini' type='number' name='quantity[]' value=".$doc['min_order_level']." step=".$doc['step_order_level'].">"?> 
@@ -73,15 +90,9 @@ defined('_JEXEC') or die('Restricted access');
                 <span class="quantity-controls quantity-plus"></span>
                 <span class="quantity-controls quantity-minus"></span>
             </span>
-    <!-- 
-        nacist parametry produktu, pridat min, step
--->           
             <input type="submit" name="addtocart" class="btn btn-primary" value="Do košíku" title="Do košíku">
             <input type="hidden" name="virtuemart_product_id[]" value=<?=$product_id?>>
             <noscript><input type="hidden" name="task" value="add"/></noscript>  
-<!--           <input type="hidden" name="task" value="add"/>  -->
-            
-
             <br/>
             <hr>
             </div>	

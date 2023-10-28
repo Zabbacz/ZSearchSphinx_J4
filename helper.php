@@ -30,8 +30,8 @@ class ModZSearchSphinxHelper
             }
             $stmt
                 ->select($db->quoteName("product_name"))
-                ->from($db->quoteName("#__sphinx_eu"))
-                ->where("MATCH"."('".$query."')"." LIMIT  0,10 OPTION ranker=sph04");
+                ->from($db->quoteName("#__sphinx_test1"))
+                ->where("MATCH"."('".$query."')"." ORDER BY product_in_stock DESC LIMIT  0,10 OPTION ranker=sph04");
 
         $db->setQuery($stmt);
         $results = $db->loadObjectList();
@@ -85,27 +85,36 @@ class ModZSearchSphinxHelper
     {
         $query  = $input->get('search_box', '', 'string');
         $docs = array();
-        $start =0;
         $offset =10;
         $current = 1;
         $url = '';
         $user = JFactory::getUser();
+        /*mozna bude potreba casem nahradit
+        $app     = Factory::getApplication();
+        $user = $app->getIdentity();
+        $userId = $user->id;
+        */        
         $userId = $user->get( 'id' );
+
+        $znacky_search = $input -> get('znacky_search','','string');
+        $query_order = '%';
+        if($znacky_search){
+            $text_db = '$db->quoteName';
+            $query_order = $znacky_search;
+        }
+        $query .= ' '.$query_order;
         $query = (string) preg_replace('/[^\p{L}\d\s]/u', ' ', $query);
         $query = trim($query);
-        $query = $query.'*';
-        if ($input -> exists('start'))
-        {
+//        $query = $query.'*';
         $start  = $input->get('start', '0', 'INT');
-	    $current = $start/$offset+1;
-	}
+        $current = $start/$offset+1;
         $db = JFactory::getDBO();
         $db = JDatabaseDriver::getInstance(self::pripojDatabazi('sphinx'));
         $stmt = $db->getQuery(true);
         $stmt
             ->select ($db->quoteName('id'))
-            ->from($db->quoteName('#__sphinx_eu'))
-            ->where("MATCH"."('".$query."')"." LIMIT "  . $start .",". $offset." OPTION ranker=sph04,field_weights=(product_name=100)");
+            ->from($db->quoteName('#__sphinx_test1'))
+            ->where("MATCH"."('".$query."')"." ORDER BY product_in_stock DESC LIMIT "  . $start .",". $offset." OPTION ranker=sph04,field_weights=(product_name=100)");
         $db->setQuery($stmt);
         $rows = $db->loadAssocList();
         $meta=$db->setQuery('show meta');
@@ -115,13 +124,13 @@ class ModZSearchSphinxHelper
 	}
         $total_found = $meta_map['total_found'];
         $total = $meta_map['total'];
-        $total_array = array($total,$total_found,$offset,$current,$start,$query);
- 	$ids = array();
+        $total_array = array('total'=> $total, 'total_found' => $total_found, 'offset' => $offset, 'current' => $current,'start' => $start, 'query' => $query);
+     	$ids = array();
         $tmpdocs = array();
         if (count($rows)> 0) {
             foreach ($rows as  $v) {
-		$ids[] =  $v['id'];
-		}
+        		$ids[] =  $v['id'];
+		    }
             $db = JFactory::getDBO();
             $db = JDatabaseDriver::getInstance(self::pripojDatabazi('joomla'));
             $user_group =$db->getQuery(true);
@@ -132,28 +141,41 @@ class ModZSearchSphinxHelper
             $db->setQuery($user_group);
             $row_user_group = $db->loadRow();
             if(!$row_user_group){$row_user_group[0]=5;}
+//            $row_user_group[0]=0;
             $q = $db->getQuery(true);
             $q
-                ->select ($db->quoteName (array('t1.virtuemart_product_id', 'product_name', 'virtuemart_category_id', 'product_availability','product_price','file_url', 't3.product_params', 't7.calc_value')))
+                ->select ($db->quoteName (array('t1.virtuemart_product_id', 't3.product_in_stock','product_name', 'virtuemart_category_id', 'product_availability','product_price','file_url', 't3.product_params', 't7.calc_value', 't9.mf_name', 't9.virtuemart_manufacturer_id')))
                 ->from($db->quoteName('#__virtuemart_products_cs_cz','t1'))
                 ->join('INNER',$db->quoteName('#__virtuemart_product_prices','t4'). ' ON ' . $db->quoteName('t1.virtuemart_product_id') . ' = ' . $db->quoteName('t4.virtuemart_product_id'))    
                 ->join('INNER',$db->quoteName('#__virtuemart_products','t3'). ' ON ' . $db->quoteName('t1.virtuemart_product_id') . ' = ' . $db->quoteName('t3.virtuemart_product_id'))
                 ->join('INNER',$db->quoteName('#__virtuemart_product_medias','t5'). ' ON ' . $db->quoteName('t1.virtuemart_product_id') . ' = ' . $db->quoteName('t5.virtuemart_product_id'))    
                 ->join('INNER',$db->quoteName('#__virtuemart_medias','t6'). ' ON ' . $db->quoteName('t5.virtuemart_media_id') . ' = ' . $db->quoteName('t6.virtuemart_media_id'))
                 ->join('INNER',$db->quoteName('#__virtuemart_calcs','t7'). ' ON ' . $db->quoteName('t4.product_tax_id') . ' = ' . $db->quoteName('t7.virtuemart_calc_id'))
+                ->join('INNER',$db->quoteName('#__virtuemart_product_manufacturers','t8'). ' ON ' . $db->quoteName('t1.virtuemart_product_id') . ' = ' . $db->quoteName('t8.virtuemart_product_id'))
+                ->join('INNER',$db->quoteName('#__virtuemart_manufacturers_cs_cz','t9'). ' ON ' . $db->quoteName('t8.virtuemart_manufacturer_id') . ' = ' . $db->quoteName('t9.virtuemart_manufacturer_id'))
                 ->join('LEFT',$db->quoteName('#__virtuemart_product_categories','t2'). ' ON ' . $db->quoteName('t1.virtuemart_product_id') . ' = ' . $db->quoteName('t2.virtuemart_product_id'))
                 ->where($db->quoteName('t1.virtuemart_product_id'). ' IN '.'  (' . implode(",", $ids) . ')')
                 ->where($db->quoteName('t4.virtuemart_shoppergroup_id'). ' = '.$row_user_group[0]);
             $db->setQuery ($q);
-//echo $q;
-
-        $q = $db->loadAssocList(); 
+            $q = $db->loadAssocList(); 
             foreach ($q as $row) {
-//                $parametry = ModZSearchSphinxHelper::getBaleni($row['product_params']);
                 $parametry = self::getBaleni($row['product_params']);
-
-                $sdph = $row['product_price']*(1+($row['calc_value']/100));
-                $tmpdocs[$row['virtuemart_product_id']] = array('product_name' => $row['product_name'], 'virtuemart_product_id' => $row['virtuemart_product_id'], 'virtuemart_category_id' => $row['virtuemart_category_id'],'product_availability' => $row['product_availability'], 'product_price' => $row['product_price'],'file_url' => $row['file_url'], 'min_order_level' => $parametry['min_order_level'], 'step_order_level' => $parametry['step_order_level'],'s_dph' => $sdph);
+                $price = Round($row['product_price'],2);
+                
+                $sdph = Round($price*(1+($row['calc_value']/100)),2);
+                $tmpdocs[$row['virtuemart_product_id']] = array(
+                    'product_name' => $row['product_name'], 
+                    'virtuemart_product_id' => $row['virtuemart_product_id'],
+                    'virtuemart_category_id' => $row['virtuemart_category_id'],
+                    'product_availability' => $row['product_availability'],
+                    'product_price' => $price,
+                    'file_url' => $row['file_url'],
+                    'min_order_level' => $parametry['min_order_level'],
+                    'step_order_level' => $parametry['step_order_level'],
+                    's_dph' => $sdph, 
+                    'manufacturer' => $row['mf_name'],
+                    'manufacturer_id' => $row['virtuemart_manufacturer_id'],
+                    'product_in_stock' => $row['product_in_stock'],);
         } 
             foreach ($ids as $id) {
                 $docs[] = $tmpdocs[$id];
@@ -162,9 +184,41 @@ class ModZSearchSphinxHelper
             $docs[$last]=$total_array;
 	}
     }
-	$docs = isset($docs) ? $docs : [];
-    
 	return $docs;  
+}
+
+public static function getManufacturers($query_znacky = null){
+    $db = JFactory::getDBO();
+    $db = JDatabaseDriver::getInstance(self::pripojDatabazi('sphinx'));
+    $stmt2 = $db->getQuery(true);
+    $stmt2
+        ->select ($db->quoteName('mf_name'))
+        ->from($db->quoteName('#__sphinx_test1'))
+        ->where("MATCH"."('".$query_znacky."')"." GROUP BY mf_name LIMIT  0,1000 OPTION ranker=sph04");
+
+    $db->setQuery($stmt2);
+//    $rows = $db->loadAssocList();
+    $manufacturers = $db->loadColumn();
+/*    $ids2 = array();
+    $tmpdocs2 = array();
+    if (count($rows)> 0) {
+        foreach ($rows as  $v) {
+        $ids2[] =  $v['id'];
+        }
+    $db = JFactory::getDBO();
+    $db = JDatabaseDriver::getInstance(self::pripojDatabazi('joomla'));
+    $q = $db->getQuery(true);
+    $q
+        ->select ($db->quoteName ('t3.mf_name'))
+        ->from($db->quoteName('#__virtuemart_products','t1'))
+        ->join('INNER',$db->quoteName('#__virtuemart_product_manufacturers','t2'). ' ON ' . $db->quoteName('t1.virtuemart_product_id') . ' = ' . $db->quoteName('t2.virtuemart_product_id'))
+        ->join('INNER',$db->quoteName('#__virtuemart_manufacturers_cs_cz','t3'). ' ON ' . $db->quoteName('t2.virtuemart_manufacturer_id') . ' = ' . $db->quoteName('t3.virtuemart_manufacturer_id'))
+        ->where($db->quoteName('t1.virtuemart_product_id'). ' IN '.'  (' . implode(",", $ids2) . ')')
+        ->group($db->quoteName('t3.mf_name'));
+        $db->setQuery($q);
+        $manufacturers = $db->loadColumn();
+    }*/
+    return $manufacturers;
     
 }
 
@@ -195,7 +249,7 @@ public static function getBaleni($vstup) {
 }
 
 private static function pripojDatabazi($database) {
-            $option = array(); //prevent problems
+            $option = array();
             switch ($database)
      {    case 'sphinx':
              $option['driver']   = 'mysql';            // Database driver name

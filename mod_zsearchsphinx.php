@@ -16,7 +16,8 @@ use Joomla\CMS\ModuleHelper;
 
 // Include the syndicate functions only once
 require_once dirname(__FILE__) . '/helper.php';
-JHtml::stylesheet(Juri::base() . 'modules/mod_zsearchsphinx/css/style.css');   
+JHtml::stylesheet(Juri::base() . '/modules/mod_zsearchsphinx/css/style.css');
+//$wa->registerAndUseStyle('mod_zsearchsphinx', 'modules/mod_zsearchsphinx/css/style.css');   
 JHtml::script(Juri::base() . 'modules/mod_zsearchsphinx/js/search.js');
 $docs = ModZSearchSphinxHelper::getSearch();
 require JModuleHelper::getLayoutPath('mod_zsearchsphinx');
