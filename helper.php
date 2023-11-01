@@ -85,7 +85,7 @@ class ModZSearchSphinxHelper
     {
         $query  = $input->get('search_box', '', 'string');
         $docs = array();
-        $offset =10;
+        $offset = 24;
         $current = 1;
         $url = '';
         $user = JFactory::getUser();

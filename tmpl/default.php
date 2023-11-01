@@ -2,7 +2,10 @@
 // No direct access
 defined('_JEXEC') or die('Restricted access');
 ?>
-<form method="GET" action="" id="search_form">
+<?php
+$action_form = JUri::root() .'index.php/obchod/';
+?>
+<form method="GET" action= <?=$action_form?> id="search_form">
         <input type="text" name="search_box" class="form-control form-control-lg" placeholder='Hledat produkt...'
               id="search_box" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" autocomplete="off"
               value="<?=isset($_GET['search_box'])?htmlentities($_GET['search_box']):''?>"
@@ -39,12 +42,13 @@ defined('_JEXEC') or die('Restricted access');
         echo'<input type="submit" name="znacky_search" class="btn btn-primary" value="'.$znacka.'">';
 
         }
-        echo '</form>';
-        echo 'Nalezeno položek : '.$docs[count((array) ($docs))]['total'].'<br />';
+        
+        echo '<br />Nalezeno položek : '.$docs[count((array) ($docs))]['total'].'<br />';
 //        echo '</form>';
     endif;
 
 ?>
+</form>
 </p>     
 <div class="row"><div class="span" style="display: none;"></div>
     <?php if (count((array)($docs)) > 0): ?>
