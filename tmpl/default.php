@@ -50,71 +50,78 @@ $action_form = JUri::root() .'index.php/obchod/';
 ?>
 </form>
 </p>     
-<div class="row"><div class="span" style="display: none;"></div>
-    <?php if (count((array)($docs)) > 0): ?>
- 	<div class="span9"><?php require_once dirname(__FILE__) . '/paginator.php';?></div>
+<!-- <div class="row"><div class="span" style="display: none;"></div> -->
+
+    
+<?php if (count((array)($docs)) > 0): ?>
+    <div class="span9"><?php require_once dirname(__FILE__) . '/paginator.php';?></div>
+     <div class="site-grid">  <!-- 1 -->
+     <div class="grid-child container-component"><!-- 2 -->     
+     <div class="category-view"> <!-- 3 -->
+     <div class="browse-view"> <!-- 4 -->
 <?php
     
-     $i = 0; foreach ($docs as $doc):
+    $i = 0; foreach ($docs as $doc):
 
-            $product_id = $doc["virtuemart_product_id"] ?? null;
-            $product_name = $doc['product_name'] ?? null;
-	        $category_id = $doc['virtuemart_category_id'] ?? null;
+        $product_id = $doc["virtuemart_product_id"] ?? null;
+        $product_name = $doc['product_name'] ?? null;
+	    $category_id = $doc['virtuemart_category_id'] ?? null;
 	?>
-            <div class="span9">
-		<div class="container">
-                <?php if (!$product_id) continue;?>
-            <form method="post" class="product js-recalculate" action="#">
-            <div class="addtocart-bar">
-                
-                <div class="main-image">
-                    <div class="product-details-imege-handler">
+    <?php if (!$product_id) continue;?>
+    <form method="post" class="product js-recalculate" action="#">
+<!--            <div class="addtocart-bar"> -->
+    <div class="product vm-col vm-col-4 vertical-separator">    <!-- 5 -->
+        <div class="spacer product-container"> <!-- 6 -->
+
+       <div class="main-image">
+            <div class="product-details-imege-handler"> 
                 <?php $image_link = JUri::root() .'images/virtuemart/product/resized/'.$doc['file_url'];?>
-            <img src=<?=$image_link;?>>
-                    </div>
-                    <div class="clear"></div>
-                </div>
+                <img src=<?=$image_link;?>>
+            </div> 
+            <div class="clear"></div>
+        </div>
 
                 
-      <?php			
-              $product_link = (JURI::root().'?option=com_virtuemart&view=productdetails&virtuemart_product_id='.($doc['virtuemart_product_id']).'&virtuemart_category_id='.($doc['virtuemart_category_id'])); 
-       ?>    
+        <?php			
+        $product_link = (JURI::root().'?option=com_virtuemart&view=productdetails&virtuemart_product_id='.($doc['virtuemart_product_id']).'&virtuemart_category_id='.($doc['virtuemart_category_id'])); 
+        ?>
+        <div class="nazev-produktu">
             <a href="<?=$product_link; ?>"><?= $doc['product_name']?></a>
-            <br />
-            <?='<strong>dostupnost : '.$doc['product_availability'].'</strong>' ?>
-            <br />
-            <br />
+        </div>
+        <br />
+        <?='<strong>dostupnost : '.$doc['product_availability'].'</strong>' ?>
+        <br />
+        <br />
+        <div class="cena">
             <?= "<i>Vaše cena : ".$doc['product_price']." Kč bez DPH/ks </i>"?>    
-
-            <span class="quantity-box">
-            <?= "<input class='input-mini' type='number' name='quantity[]' value=".$doc['min_order_level']." step=".$doc['step_order_level'].">"?> 
-
-            </span>
-                <span class="quantity-controls js-recalculate">
-                <span class="quantity-controls quantity-plus"></span>
-                <span class="quantity-controls quantity-minus"></span>
-            </span>
-            <input type="submit" name="addtocart" class="btn btn-primary" value="Do košíku" title="Do košíku">
-            <input type="hidden" name="virtuemart_product_id[]" value=<?=$product_id?>>
-            <noscript><input type="hidden" name="task" value="add"/></noscript>  
-            <br/>
-            <hr>
-            </div>	
-            <input type="hidden" name="option" value="com_virtuemart">
-            <input type="hidden" name="view" value="cart">
-            <input type="hidden" name="virtuemart_product_id[]" value=<?=$product_id?>>
-            <input type="hidden" name="pname" value=<?=$product_name?>>
-            <input type="hidden" name="pid" value=<?=$product_id?>>
-            <input type="hidden" name="Itemid" value=<?=$category_id?>>
-            </form>
-                    </div>
-            </div>
-
-                
-                
-	<?php $i++; endforeach; ?>
-        <div class="span9"><?php require dirname(__FILE__) . '/paginator.php';?></div>
-    	<?php elseif (isset($_GET['query']) && $_GET['query'] != ''): ?>
-            <p>Nenalezeno !</p>
+        </div>
+        <span class="quantity-box">
+        <?= "<input class='input-mini' type='number' name='quantity[]' value=".$doc['min_order_level']." step=".$doc['step_order_level'].">"?> 
+        </span>
+        <span class="quantity-controls js-recalculate">
+        <span class="quantity-controls quantity-plus"></span>
+        <span class="quantity-controls quantity-minus"></span>
+        </span>
+        <input type="submit" name="addtocart" class="btn btn-primary" value="Do košíku" title="Do košíku">
+        <input type="hidden" name="virtuemart_product_id[]" value=<?=$product_id?>>
+        <noscript><input type="hidden" name="task" value="add"/></noscript>  
+        <br/>
+        <input type="hidden" name="option" value="com_virtuemart">
+        <input type="hidden" name="view" value="cart">
+        <input type="hidden" name="virtuemart_product_id[]" value=<?=$product_id?>>
+        <input type="hidden" name="pname" value=<?=$product_name?>>
+        <input type="hidden" name="pid" value=<?=$product_id?>>
+        <input type="hidden" name="Itemid" value=<?=$category_id?>>
+    </div>	<!-- 6 -->
+</div>  <!-- 5 -->
+         
+</form>
+<?php $i++; endforeach; ?>
+</div> <!-- 4 -->
+</div> <!-- 3 -->
+</div> <!-- 2 -->
+</div> <!-- 1 -->
+<div class="span9"><?php require dirname(__FILE__) . '/paginator.php';?></div>
+    <?php elseif (isset($_GET['query']) && $_GET['query'] != ''): ?>
+        <p>Nenalezeno !</p>
 	<?php endif; ?>
-</div>

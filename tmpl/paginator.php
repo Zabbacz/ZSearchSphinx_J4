@@ -6,7 +6,7 @@ $total = $docs[count((array) ($docs))]['total'];
 $offset = $docs[count((array) ($docs))]['offset'];
 //$offset = $docs['offset'];
 $pageCount = ceil($total/$offset);
-$url = '';
+$url = 'obchod/';
 if ($pageCount): 
 $query =  $docs[count((array) ($docs))]['query'];
 //$query =  $docs['query'];
@@ -27,7 +27,7 @@ $last = $pageCount;
 <!-- First page link -->
 <?php if (isset($previous)): ?>
   <a href="<?php echo $url;?>?search_box=<?php echo $query;?>&start =<?php echo $first*$offset;?>">
-    <i class="icon-step-backward"></i></a> |
+    <i class="icon-step-backward"><<</i></a> |
 <?php else: ?>
   <i class="icon-step-backward disabled"></i></a> |
 <?php endif; ?>
@@ -54,7 +54,7 @@ $last = $pageCount;
 
 <!-- Next page link -->
 <?php if (isset($next)): ?>
-  <a href="?<?php echo $url;?>search_box=<?php echo $query;?>&start=<?php echo ($next-1)*$offset;?>">
+  <a href="<?php echo $url;?>?search_box=<?php echo $query;?>&start=<?php echo ($next-1)*$offset;?>">
    <i class="icon-arrow-right"></i></a>|
 <?php else: ?>
   <span class="disabled"><i class="icon-arrow-right"></i></span> |
@@ -63,7 +63,7 @@ $last = $pageCount;
 <!-- Last page link -->
 <?php if (isset($next)): ?>
   <a href="<?php echo $url;?>?search_box=<?php echo $query;?>&start=<?php echo ($last-1)*$offset?>">
-    <i class="icon-step-forward"></i>
+    <i class="icon-step-forward">>></i>
   </a>
 <?php else: ?>
  <i class="icon-step-forward disabled"></i>

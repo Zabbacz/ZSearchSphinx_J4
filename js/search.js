@@ -25,7 +25,6 @@ function get_text(event)
 		document.getElementById('search_result').innerHTML = '';
 
 	});
-
 	
 
 }

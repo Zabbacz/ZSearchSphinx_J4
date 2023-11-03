@@ -15,9 +15,11 @@ color: #ffffff;
 {
 	background:#FFFFFF;
 }
+
 .sphinx_search a {
   color: #E56A00 ;
-}
+  }
+
 ul {
     list-style: none;
 }
@@ -35,14 +37,20 @@ ul {
     line-height: 30px;
     text-align: left;
 }
+.nazev-produktu{
+  height:80px;
+}
 
+.cena{
+  height:60px;
+}
 
 .product-details-imege-handler {
-    width: 300px;
-    text-align: center;
+    height:120px;
+/*    text-align: center;
     margin-left: 20px;
     position: absolute;
-    right: 12em;
+    right: 12em;*/
 }
         
 

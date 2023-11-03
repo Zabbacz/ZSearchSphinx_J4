@@ -84,10 +84,11 @@ class ModZSearchSphinxHelper
     if ($input -> exists('search_box'))
     {
         $query  = $input->get('search_box', '', 'string');
+        if(strlen($query)<4){$query='musiszadattriznaky';}
         $docs = array();
         $offset = 24;
         $current = 1;
-        $url = '';
+        $url = 'obchod/';
         $user = JFactory::getUser();
         /*mozna bude potreba casem nahradit
         $app     = Factory::getApplication();
