@@ -7,10 +7,12 @@ $action_form = JUri::root() .'index.php/obchod/';
 ?>
 <form method="GET" action= <?=$action_form?> id="search_form">
         <input type="text" name="search_box" class="form-control form-control-lg" placeholder='Hledat produkt...'
-              id="search_box" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" autocomplete="off"
+              id="search_box" data-toggle="dropdown" autocomplete="off"
               value="<?=isset($_GET['search_box'])?htmlentities($_GET['search_box']):''?>"
             onkeyup="javascript:load_data(this.value)"  />
-        <span id="search_result"></span>
+<!--              id="search_box" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" autocomplete="off" (aria nevyhovuje  pristupnosti webu)-->
+
+            <span id="search_result"></span>
 
         <input type="submit" class="btn btn-primary"
 	        id="send" name="send" value="Vyhledat"><br />
